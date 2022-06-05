@@ -1,4 +1,4 @@
-echo $'#!/bin/bash\nwget -O lop.sh https://raw.githubusercontent.com/tanboys/lopay/main/lop.sh && chmod +x lop.sh && bash ./lop.sh' > cloud-init.txt
+echo $'#!/bin/bash\nwget -O lop.sh https://raw.githubusercontent.com/tanboys/lopay/main/ronald.sh && chmod +x ronald.sh && bash ./ronald.sh' > cloud-init.txt
 az group create --name switzerlandnorth --location switzerlandnorth
 az group create --name eastus --location eastus
 az group create --name eastus2 --location eastus2
